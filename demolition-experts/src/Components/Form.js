@@ -3,7 +3,9 @@ import * as Yup from 'yup'
 import axios from 'axios'
 
 function Form(props){
-    const [user, setUser] = useState({name: "", email:"", password:"", terms:false})
+    const blank = {name: "", email:"", password:"", terms:false, service: ""}
+    const [message, setMessage] = useState("")
+    const [user, setUser] = useState(blank)
     const [errors, setErrors] = useState({name: "", email: "", password:"", terms: ""})
     const [valid, setValid] = useState(false)
     const formSchema = Yup.object().shape({
@@ -18,6 +20,10 @@ function Form(props){
             .string()
             .min(6, "Passwords must be at least 6 characters long")
             .required(),
+        service: Yup
+            .mixed()
+            .oneOf(['building', 'mountain', 'tunnel', 'hell'], "Please select a service")
+            .defined(),
         terms: Yup
             .boolean()
             .oneOf([true], "You must accept Terms and Conditions")
@@ -56,8 +62,11 @@ function Form(props){
         axios.post('https://reqres.in/api/users', user)
         .then(res =>{
             console.log(res);
-            props.add(res.data)
-            setUser({name: "", email:"", password:"", terms:false})
+            setMessage(props.add(res.data));
+            setTimeout(() =>{
+                setMessage("")
+            }, 5000)
+            setUser(blank)
         })
 
         
@@ -72,6 +81,7 @@ function Form(props){
 
     return (
         <div className='form'>
+            <p className={`message ${message !== '' ? ' popup' : ''}`}>{message}</p>
             <form onSubmit={submitUser}>
                 <label htmlFor='name' >Name
                 <input type='text' id='name' name='name' onChange={handleChanges} value={user.name}/>
@@ -88,9 +98,22 @@ function Form(props){
                 <input type='password' id='password' name='password'  onChange={handleChanges} value={user.password}/>
                 <span>{errors.password}</span>
                 </label>
+
+                <label htmlFor='service' >
+                    Service
+                    <select id='service' name='service' onChange={handleChanges} value={user.service}>
+                        <option value=""> --- Select what you need demolished ---</option>
+                        <option value='building'>Building</option>
+                        <option value='mountain'>Mountain</option>
+                        <option value='tunnel'>Tunnel</option>
+                        <option value='hell'>Gates of Hell</option>
+                    </select>
+                    <span>{errors.service}</span>
+                </label>
                 
                 <label htmlFor='terms' >Accept Terms of Service
                 <input type='checkbox' id='terms' name='terms' checked={user.terms} onChange={handleChanges}/>
+                
                 </label>
                 
                 
