@@ -11,3 +11,35 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+form{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 30%;
+  margin-left: 35%;
+}
+form label{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+form input{
+  margin: 10px 20px;
+  border: 2px solid blue;
+  height: 3rem;
+  font-size: 2rem; 
+}
+form input:focus{
+  border: 2px solid red;
+}
+form input[type='checkbox']{
+  margin: auto;
+}
+
+.user{
+  border: 1px solid black;
+}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import * as Yup from 'yup'
+import axios from 'axios'
 
 function Form(props){
     const [user, setUser] = useState({name: "", email:"", password:"", terms:false})
@@ -24,6 +25,17 @@ function Form(props){
 
     function handleChanges(e){
         e.persist();
+        validateContent(e)
+
+        setUser({
+            ...user,
+            [e.target.name]: e.target.name === 'terms' ?
+                e.target.checked :
+                e.target.value
+        });
+    }
+
+    function validateContent(e){
         Yup.reach(formSchema, e.target.name)
         .validate(e.target.value)
         .then(valid =>{
@@ -38,11 +50,17 @@ function Form(props){
                 [e.target.name]: err.errors[0]
             })
         });
+    }
+    function submitUser(e){
+        e.preventDefault();
+        axios.post('https://reqres.in/api/users', user)
+        .then(res =>{
+            console.log(res);
+            props.add(res.data)
+            setUser({name: "", email:"", password:"", terms:false})
+        })
 
-        setUser({
-            ...user,
-            [e.target.name]: e.target.value
-        });
+        
     }
 
     useEffect(() =>{
@@ -54,25 +72,31 @@ function Form(props){
 
     return (
         <div className='form'>
-            <form>
-                <label htmlFor='name' >Name</label>
-                <input type='text' id='name' name='name' onChange={handleChanges}/>
+            <form onSubmit={submitUser}>
+                <label htmlFor='name' >Name
+                <input type='text' id='name' name='name' onChange={handleChanges} value={user.name}/>
                 <span>{errors.name}</span>
+                </label>
                 
-                <label htmlFor='email' >Email</label>
-                <input type='email' id='email' name='email'  onChange={handleChanges}/>
+                <label htmlFor='email' >
+                    Email
+                <input type='email' id='email' name='email'  onChange={handleChanges} value={user.email}/>
                 <span>{errors.email}</span>
+                </label>
                 
-                <label htmlFor='password' >Password</label>
-                <input type='password' id='password' name='password'  onChange={handleChanges}/>
+                <label htmlFor='password' >Password
+                <input type='password' id='password' name='password'  onChange={handleChanges} value={user.password}/>
                 <span>{errors.password}</span>
+                </label>
                 
-                <label htmlFor='terms' >Accept Terms of Service</label>
+                <label htmlFor='terms' >Accept Terms of Service
                 <input type='checkbox' id='terms' name='terms' checked={user.terms} onChange={handleChanges}/>
+                </label>
                 
                 
-                <label htmlFor='submit' />
-                <input type='submit' id='submit' disabled={!valid}/>
+                <label htmlFor='submit'>
+                <button type='submit' id='submit' disabled={!valid} onSubmit={submitUser}>Create Account</button>
+                </label>
 
             </form>
         </div>
