@@ -54,11 +54,19 @@ function Form(props){
             setErrors({
                 ...errors,
                 [e.target.name]: err.errors[0]
+                
             })
         });
     }
     function submitUser(e){
         e.preventDefault();
+        if(!valid){
+            setMessage("Please fix errors in form before submitting")
+            setTimeout(() =>{
+                setMessage("")
+            }, 5000)
+            return;
+        }
         axios.post('https://reqres.in/api/users', user)
         .then(res =>{
             console.log(res);
